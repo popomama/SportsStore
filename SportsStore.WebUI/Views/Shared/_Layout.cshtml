@@ -25,13 +25,21 @@
             </div>
         </div>
     </div>
+    <div class="navbar navbar-inverse" role="navigation">
+        <a class="navbar-brand" href="#">SPORTS STORE</a>
+    </div>
+    <div class="row panel">
+        <div id="categories" class="col-xs-3">
+            Put something useful here later
+        </div>
+        <div class="col-xs-8">
+            @RenderBody()
 
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
+            <hr />
+            <footer>
+                <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            </footer>
+        </div>
     </div>
 
     <script src="~/Scripts/jquery-1.10.2.min.js"></script>
