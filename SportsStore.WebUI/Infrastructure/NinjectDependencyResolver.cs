@@ -8,6 +8,7 @@ using Moq;
 using SportsStore.Domain.Entities;
 using SportsStore.Domain.Abstract;
 using SportsStore.Domain.Concrete;
+using System.Configuration;
 
 namespace SportsStore.WebUI.Infrastructure
 {
@@ -40,7 +41,14 @@ namespace SportsStore.WebUI.Infrastructure
             //        new Product { Name = "Running shoes", Price = 95 }
             //    });
 //            kernel.Bind<IProductRepository>().ToConstant(mock.Object);
+
+            EmailSettings emailSettings = new EmailSettings
+            {
+                WriteAsFile = bool.Parse(ConfigurationManager.AppSettings["Email.WriteAsFile"] ?? "false")
+            };
+
             kernel.Bind<IProductRepository>().To<EFProductRepository>();
+            kernel.Bind<IOrderProcessor>().To<EmailOrderProcessor>().WithConstructorArgument("settings",emailSettings);
         }
 
     }
