@@ -10,6 +10,8 @@ using SportsStore.WebUI.Controllers;
 using System.Collections.Generic;
 using System.Linq;
 
+using SportsStore.WebUI.Infrastructure.Abstract;
+using SportsStore.WebUI.Models;
 
 namespace SportsStore.UnitTests
 {
@@ -521,6 +523,75 @@ namespace SportsStore.UnitTests
             mock.Verify(m => m.SaveProduct(It.IsAny<Product>()), Times.Never());
             // Assert - check the method result type
             Assert.IsInstanceOfType(result, typeof(ViewResult));
+        }
+
+        [TestMethod]
+        public void Can_Delete_Valid_Products()
+        {
+            // Arrange - create a Product
+            Product prod = new Product { ProductID = 2, Name = "Test" };
+            // Arrange - create the mock repository
+            Mock<IProductRepository> mock = new Mock<IProductRepository>();
+            mock.Setup(m => m.Products).Returns(new Product[] {
+                                                            new Product {ProductID = 1, Name = "P1"},
+                                                            prod,
+                                                            new Product {ProductID = 3, Name = "P3"},
+                                                            }
+                                                  );
+            // Arrange - create the controller
+            AdminController target = new AdminController(mock.Object);
+            // Act - delete the product
+            target.Delete(prod.ProductID);
+            // Assert - ensure that the repository delete method was
+            // called with the correct Product
+            mock.Verify(m => m.DeleteProduct(prod.ProductID));
+        }
+
+
+        [TestClass]
+        public class AdminSecurityTests
+        {
+            [TestMethod]
+            public void Can_Login_With_Valid_Credentials()
+            {
+                // Arrange - create a mock authentication provider
+                Mock<IAuthProvider> mock = new Mock<IAuthProvider>();
+                mock.Setup(m => m.Authenticate("admin", "secret")).Returns(true);
+                // Arrange - create the view model
+                LoginViewModel model = new LoginViewModel
+                {
+                    UserName = "admin",
+                    Password = "secret"
+                };
+                // Arrange - create the controller
+                AccountController target = new AccountController(mock.Object);
+                // Act - authenticate using valid credentials
+                ActionResult result = target.Login(model, "/MyURL");
+                // Assert
+                Assert.IsInstanceOfType(result, typeof(RedirectResult));
+                Assert.AreEqual("/MyURL", ((RedirectResult)result).Url);
+            }
+        }
+
+        [TestMethod]
+        public void Cannot_Login_With_Invalid_Credentials()
+        {
+            // Arrange - create a mock authentication provider
+            Mock<IAuthProvider> mock = new Mock<IAuthProvider>();
+            mock.Setup(m => m.Authenticate("badUser", "badPass")).Returns(false);
+            // Arrange - create the view model
+            LoginViewModel model = new LoginViewModel
+            {
+                UserName = "badUser",
+                Password = "badPass"
+            };
+            // Arrange - create the controller
+            AccountController target = new AccountController(mock.Object);
+            // Act - authenticate using valid credentials
+            ActionResult result = target.Login(model, "/MyURL");
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ViewResult));
+            Assert.IsFalse(((ViewResult)result).ViewData.ModelState.IsValid);
         }
     }
 }
