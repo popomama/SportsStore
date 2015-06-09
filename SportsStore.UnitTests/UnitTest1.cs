@@ -9,9 +9,8 @@ using SportsStore.Domain.Entities;
 using SportsStore.WebUI.Controllers;
 using System.Collections.Generic;
 using System.Linq;
-
 using SportsStore.WebUI.Infrastructure.Abstract;
-using SportsStore.WebUI.Models;
+
 
 namespace SportsStore.UnitTests
 {
